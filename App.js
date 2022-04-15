@@ -1,9 +1,9 @@
 import AppLoading from "expo-app-loading";
-import React from "react";
+import React, { useState } from "react";
 import * as Font from "expo-font";
-import { Text, Image } from "react-native";
+import { Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Asset, useAssets } from "expo-asset";
+import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import Tabs from "./navigation/Tabs";
 
@@ -23,10 +23,6 @@ export default function App() {
   const onFinish = () => setReady(true);
   const startLoading = async () => {
     const fonts = loadFonts([Ionicons.font]);
-    const images = loadImages([
-      require("./my-face.jpeg"),
-      "https://reactnative.dev/img/oss_logo.png",
-    ]);
     await Promise.all([...fonts]);
   };
   if (!ready) {
