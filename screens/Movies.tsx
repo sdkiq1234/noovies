@@ -1,23 +1,16 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { BlurView } from 'expo-blur';
 import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  StyleSheet,
-  useColorScheme,
-} from 'react-native';
+import { ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
 import Swiper from 'react-native-swiper';
 import styled from 'styled-components/native';
-import { makeImgPath } from '../utils';
+import HMedia from '../components/HMedia';
+import Poster from '../components/Poster';
+import Slide from '../components/Slide';
+import VMedia from '../components/VMedia';
 
 const API_KEY = 'f0558db31aae412648cf101d48d86d44';
 
 const Container = styled.ScrollView``;
-
-const View = styled.View`
-  flex: 1;
-`;
 
 const Loader = styled.View`
   flex: 1;
@@ -25,47 +18,49 @@ const Loader = styled.View`
   align-items: center;
 `;
 
-const BgImg = styled.Image``;
-
-const Title = styled.Text<{ isDark: boolean }>`
-  font-size: 16px;
+const ListTitle = styled.Text`
+  color: white;
+  font-size: 18px;
   font-weight: 600;
-  color: ${(props) => (props.isDark ? 'white' : props.theme.textColor)};
+  margin-left: 30px;
+  margin-top: 30px;
 `;
 
-const Poster = styled.Image`
-  width: 100px;
-  height: 160px;
-  border-radius: 5px;
+const TrendingScroll = styled.ScrollView`
+  margin-top: 20px;
 `;
-const Wrapper = styled.View`
-  flex-direction: row;
-  height: 100%;
-  width: 90%;
-  margin: 0 auto;
-  justify-content: space-around;
+
+const Movie = styled.View`
+  margin-left: 15px;
   align-items: center;
 `;
-const Column = styled.View`
-  width: 60%;
+
+const Title = styled.Text`
+  color: white;
+  font-weight: 600;
+  margin-bottom: 5px;
+  margin-top: 5px;
 `;
 
-const Overview = styled.Text<{ isDark: boolean }>`
-  margin-top: 10px;
-  color: ${(props) =>
-    props.isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.8)'};
+const Votes = styled.Text`
+  color: rgba(255,255,255,0.8)
+  font-size: 10px;
 `;
 
-const Votes = styled(Overview)`
-  font-size: 12px;
+const ListContainer = styled.View``;
+
+const ComingSoonTitle = styled(ListTitle)`
+  margin-bottom: 30px;
 `;
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
-  const isDark = useColorScheme() === 'light';
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [nowPlaying, setNowPlaying] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [trending, setTrending] = useState([]);
   const getNowPlaying = async () => {
     const { results } = await (
       await fetch(
@@ -73,17 +68,45 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
       )
     ).json();
     setNowPlaying(results);
+  };
+  const getUpcoming = async () => {
+    const { results } = await (
+      await fetch(
+        `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&language=en-US&page=1`
+      )
+    ).json();
+    setUpcoming(results);
+  };
+  const getTrending = async () => {
+    const { results } = await (
+      await fetch(
+        `https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`
+      )
+    ).json();
+    setTrending(results);
+  };
+  const getData = async () => {
+    await Promise.all([getTrending(), getUpcoming(), getNowPlaying()]);
     setLoading(false);
   };
   useEffect(() => {
-    getNowPlaying();
+    getData();
   }, []);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
+  };
   return loading ? (
     <Loader>
       <ActivityIndicator color={'white'} />
     </Loader>
   ) : (
-    <Container>
+    <Container
+      refreshControl={
+        <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+      }
+    >
       <Swiper
         horizontal
         loop
@@ -94,32 +117,43 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         containerStyle={{ width: '100%', height: SCREEN_HEIGHT / 4 }}
       >
         {nowPlaying.map((movie) => (
-          <View key={movie.id}>
-            <BgImg
-              style={StyleSheet.absoluteFill}
-              source={{ uri: makeImgPath(movie.backdrop_path) }}
-            />
-            <BlurView
-              style={StyleSheet.absoluteFill}
-              tint={isDark ? 'dark' : 'light'}
-              intensity={85}
-            >
-              <Wrapper>
-                <Poster source={{ uri: makeImgPath(movie.poster_path) }} />
-                <Column>
-                  <Title isDark={isDark}>{movie.original_title}</Title>
-                  {movie.vote_average > 0 ? (
-                    <Votes isDark={isDark}>⭐ {movie.vote_average}/10</Votes>
-                  ) : null}
-                  <Overview isDark={isDark}>
-                    {movie.overview.slice(0, 100)}...
-                  </Overview>
-                </Column>
-              </Wrapper>
-            </BlurView>
-          </View>
+          <Slide
+            key={movie.id}
+            backdropPath={movie.backdrop_path}
+            posterPath={movie.poster_path}
+            originalTitle={movie.original_title}
+            voteAverage={movie.vote_average}
+            overview={movie.overview}
+          />
         ))}
       </Swiper>
+      <ListContainer>
+        <ListTitle>Trending Movies</ListTitle>
+        <TrendingScroll
+          contentContainerStyle={{ paddingRight: 15 }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {trending.map((movie) => (
+            <VMedia
+              key={movie.id}
+              posterPath={movie.poster_path}
+              originalTitle={movie.original_title}
+              voteAverage={movie.vote_average}
+            />
+          ))}
+        </TrendingScroll>
+      </ListContainer>
+      <ComingSoonTitle>Coming soon</ComingSoonTitle>
+      {upcoming.map((movie) => (
+        <HMedia
+          key={movie.id}
+          posterPath={movie.poster_path}
+          originalTitle={movie.original_title}
+          overview={movie.overview}
+          releaseDate={movie.release_date}
+        />
+      ))}
     </Container>
   );
 };
