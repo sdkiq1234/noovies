@@ -9,6 +9,7 @@ import VMedia from '../components/VMedia';
 import Loader from '../components/Loader';
 import { useQuery, useQueryClient } from 'react-query';
 import { MovieResponse, moviesApi } from '../api';
+import HList from '../components/HList';
 
 const ListTitle = styled.Text`
   color: white;
@@ -21,8 +22,6 @@ const ListTitle = styled.Text`
 const TrendingScroll = styled.FlatList`
   margin-top: 15px;
 ` as unknown as typeof FlatList;
-
-const ListContainer = styled.View``;
 
 const ComingSoonTitle = styled(ListTitle)`
   margin-bottom: 15px;
@@ -88,26 +87,10 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
               />
             ))}
           </Swiper>
-          <ListContainer>
-            <ListTitle>Trending Movies</ListTitle>
-            {trendingData ? (
-              <TrendingScroll
-                data={trendingData.results}
-                horizontal
-                keyExtractor={(item) => item.id + ''}
-                ItemSeparatorComponent={HSeparator}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingRight: 15 }}
-                renderItem={({ item }) => (
-                  <VMedia
-                    posterPath={item.poster_path || ''}
-                    originalTitle={item.original_title}
-                    voteAverage={item.vote_average}
-                  />
-                )}
-              />
-            ) : null}
-          </ListContainer>
+          {trendingData ? (
+            <HList title="Trending Movies" data={trendingData.results} />
+          ) : null}
+
           <ComingSoonTitle>Coming soon</ComingSoonTitle>
         </>
       }
