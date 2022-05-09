@@ -1,9 +1,15 @@
+import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import React from 'react';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import {
+  TouchableWithoutFeedback,
+  useColorScheme,
+  View,
+  StyleSheet,
+} from 'react-native';
 import styled from 'styled-components/native';
-import { makeImgPath } from '../utils';
 import Poster from './Poster';
+import { makeImgPath } from '../utils';
 
 const BgImg = styled.Image``;
 
@@ -51,29 +57,36 @@ const Slide: React.FC<SlidePRops> = ({
   overview,
 }) => {
   const isDark = useColorScheme() === 'light';
+  const navigation = useNavigation();
+  const goToDetail = () => {
+    navigation.navigate('Stack', { screen: 'Detail' });
+  };
+
   return (
-    <View style={{ flex: 1 }}>
-      <BgImg
-        style={StyleSheet.absoluteFill}
-        source={{ uri: makeImgPath(backdropPath) }}
-      />
-      <BlurView
-        style={StyleSheet.absoluteFill}
-        tint={isDark ? 'dark' : 'light'}
-        intensity={85}
-      >
-        <Wrapper>
-          <Poster path={posterPath} />
-          <Column>
-            <Title isDark={isDark}>{originalTitle}</Title>
-            {voteAverage > 0 ? (
-              <Votes isDark={isDark}>⭐ {voteAverage}/10</Votes>
-            ) : null}
-            <Overview isDark={isDark}>{overview.slice(0, 100)}...</Overview>
-          </Column>
-        </Wrapper>
-      </BlurView>
-    </View>
+    <TouchableWithoutFeedback onPress={goToDetail}>
+      <View style={{ flex: 1 }}>
+        <BgImg
+          style={StyleSheet.absoluteFill}
+          source={{ uri: makeImgPath(backdropPath) }}
+        />
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          tint={isDark ? 'dark' : 'light'}
+          intensity={85}
+        >
+          <Wrapper>
+            <Poster path={posterPath} />
+            <Column>
+              <Title isDark={isDark}>{originalTitle}</Title>
+              {voteAverage > 0 ? (
+                <Votes isDark={isDark}>⭐ {voteAverage}/10</Votes>
+              ) : null}
+              <Overview isDark={isDark}>{overview.slice(0, 100)}...</Overview>
+            </Column>
+          </Wrapper>
+        </BlurView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

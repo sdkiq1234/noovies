@@ -10,7 +10,8 @@ const ListTitle = styled.Text`
   font-size: 18px;
   font-weight: 600;
   margin-left: 30px;
-  margin-top: 30px;
+  margin-bottom: 15px;
+  margin-top: 15px;
 `;
 
 const HListSeparator = styled.View`
@@ -35,7 +36,7 @@ const HList: React.FC<HListProps> = ({ data, title }) => (
       renderItem={({ item }) => (
         <VMedia
           posterPath={item.poster_path || ''}
-          originalTitle={item.original_title}
+          originalTitle={item.original_title ?? item.original_name}
           voteAverage={item.vote_average}
         />
       )}
