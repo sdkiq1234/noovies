@@ -56,13 +56,15 @@ const HMedia: React.FC<HMediaProps> = ({
         <Poster path={posterPath} />
         <HColumn>
           <Title>{originalTitle}</Title>
-          <Release>
-            {new Date(releaseDate).toLocaleDateString('ko', {
-              month: 'long',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </Release>
+          {releaseDate ? (
+            <Release>
+              {new Date(releaseDate).toLocaleDateString('ko', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </Release>
+          ) : null}
           <Overview>
             {overview !== '' && overview.length > 140
               ? `${overview.slice(0, 140)}...`
