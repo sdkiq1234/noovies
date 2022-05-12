@@ -10,6 +10,7 @@ import {
 import styled from 'styled-components/native';
 import Poster from './Poster';
 import { makeImgPath } from '../utils';
+import { Movie } from '../api';
 
 const BgImg = styled.Image``;
 
@@ -47,6 +48,7 @@ interface SlidePRops {
   originalTitle: string;
   voteAverage: number;
   overview: string;
+  fullData: Movie;
 }
 
 const Slide: React.FC<SlidePRops> = ({
@@ -55,11 +57,17 @@ const Slide: React.FC<SlidePRops> = ({
   originalTitle,
   voteAverage,
   overview,
+  fullData,
 }) => {
   const isDark = useColorScheme() === 'light';
   const navigation = useNavigation();
   const goToDetail = () => {
-    navigation.navigate('Stack', { screen: 'Detail' });
+    navigation.navigate('Stack', {
+      screen: 'Detail',
+      params: {
+        fullData,
+      },
+    });
   };
 
   return (
