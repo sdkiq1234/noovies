@@ -65,7 +65,7 @@ const Slide: React.FC<SlidePRops> = ({
     navigation.navigate('Stack', {
       screen: 'Detail',
       params: {
-        fullData,
+        ...fullData,
       },
     });
   };

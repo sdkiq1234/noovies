@@ -5,6 +5,6 @@ export const lightTheme = {
 };
 export const darkTheme = {
   mainBgColor: '#1e272e',
-  textColor: '#2f2f2f',
+  textColor: '#999999',
   accentColor: 'yellow',
 };

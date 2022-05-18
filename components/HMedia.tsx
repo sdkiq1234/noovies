@@ -54,7 +54,7 @@ const HMedia: React.FC<HMediaProps> = ({
     navigation.navigate('Stack', {
       screen: 'Detail',
       params: {
-        fullData,
+        ...fullData,
       },
     });
   };

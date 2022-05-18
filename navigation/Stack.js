@@ -1,7 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
-import Detail from '../components/Detail';
+import Detail from '../screens/Detail';
 import { BLACK_COLOR } from '../colors';
 
 const NativeStack = createNativeStackNavigator();
