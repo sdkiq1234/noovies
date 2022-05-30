@@ -63,21 +63,11 @@ const Detail: React.FC<DetailScreenProps> = ({
   navigation: { setOptions },
   route: { params },
 }) => {
-  const { isLoading: moviesLoading, data: moviesData } = useQuery(
-    ['movies', params.id],
-    moviesApi.detail,
-    {
-      enabled: 'original_title' in params,
-    }
-  );
-  const { isLoading: tvLoading, data: tvData } = useQuery(
-    ['tv', params.id],
-    tvApi.detail,
-    {
-      enabled: 'original_name' in params,
-    }
-  );
   const isMovie = 'original_title' in params;
+  const { isLoading, data } = useQuery(
+    [isMovie ? 'movies' : 'tv', params.id],
+    isMovie ? moviesApi.detail : tvApi.detail
+  );
   // const { isLoading, data } = useQuery(
   //   [isMovie ? 'movies' : 'tv', params.id],
   //   isMovie ? moviesApi.detail : tvApi.detail
@@ -114,24 +104,15 @@ const Detail: React.FC<DetailScreenProps> = ({
       </Header>
       <Data>
         <Overview>{params.overview}</Overview>
-        {isMovie ? moviesLoading : tvLoading ? <Loader /> : null}
-        {isMovie
-          ? moviesData?.videos?.results?.map((video) =>
-              video.site === 'YouTube' ? (
-                <VideoBtn key={video.key} onPress={() => openYTLink(video.key)}>
-                  <Ionicons name="logo-youtube" color="white" size={24} />
-                  <BtnText>{video.name}</BtnText>
-                </VideoBtn>
-              ) : null
-            )
-          : tvData?.videos?.results?.map((video) =>
-              video.site === 'YouTube' ? (
-                <VideoBtn key={video.key} onPress={() => openYTLink(video.key)}>
-                  <Ionicons name="logo-youtube" color="white" size={24} />
-                  <BtnText>{video.name}</BtnText>
-                </VideoBtn>
-              ) : null
-            )}
+        {isLoading ? <Loader /> : null}
+        {data?.videos?.results?.map((video) =>
+          video.site === 'YouTube' ? (
+            <VideoBtn key={video.key} onPress={() => openYTLink(video.key)}>
+              <Ionicons name="logo-youtube" color="white" size={24} />
+              <BtnText>{video.name}</BtnText>
+            </VideoBtn>
+          ) : null
+        )}
       </Data>
     </Container>
   );
